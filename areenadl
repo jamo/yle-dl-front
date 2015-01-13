@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+require 'cgi'
+require 'tmpdir'
+require 'fileutils'
+
+cgi = CGI.new
+real_id = cgi.path_info.gsub("/", "")
+
+id = real_id[/^[0-9]+$/]
+if id != real_id
+  raise "id not allowed, id: #{id}, #{real_id}"
+end
+
+txt = "    "
+dir = File.join(Dir.tmpdir, "areenadl", id)
+downloading_file_name = File.join(dir, "downloading")
+if cgi.params['delete'].any?
+  FileUtils.rm_rf dir if Dir.exists?(dir) #&! dir.to_s.include?("..")
+  cgi.out(status: "301", location: "/") { 'Removed' }
+  return
+else
+  unless Dir.exists? dir
+    FileUtils.mkdir_p(dir)
+    unless File.exists? downloading_file_name
+      fork do
+        Dir.chdir(dir) do
+          FileUtils.touch(downloading_file_name)
+          `yle-dl http://areena.yle.fi/tv/#{id}`
+          FileUtils.rm(downloading_file_name)
+        end
+      end
+    end
+  end
+end
+
+cgi.out(status: "301", location: "/#{id}") { 'success' }
