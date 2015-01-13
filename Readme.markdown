@@ -1,8 +1,11 @@
 CGI interface for yle-dl
 
-`yle-dl` must be in $PATH
+[`yle-dl`](http://aajanki.github.io/yle-dl/) must be in `$PATH` of the process executing the `areenadl` GCI script
 
 Can be deployed as apache CGI script.
+Place `areenadl` from this repo to path pointed by ScriptAlias, e.g. to /opt/areenadl/
+
+This uses /tmp/areenadl/ for storing downloaded files.
 
 ```
 <VirtualHost *:443>
@@ -33,6 +36,7 @@ This provides following api
 
 * /get/:id?delete=1
 > If file with :id is downloaded, removes the folder with the name of :id
+
 
 
 
