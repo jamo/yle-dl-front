@@ -22,13 +22,14 @@ else
   unless Dir.exists? dir
     FileUtils.mkdir_p(dir)
     unless File.exists? downloading_file_name
-      fork do
+      pid = fork do
         Dir.chdir(dir) do
           FileUtils.touch(downloading_file_name)
           `yle-dl http://areena.yle.fi/tv/#{id}`
           FileUtils.rm(downloading_file_name)
         end
       end
+      Process.detach(pid)
     end
   end
 end
